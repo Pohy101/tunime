@@ -1,8 +1,9 @@
 // Cloudflare Worker для проксирования запросов к Kodik API
 // Ключ хранится в переменной окружения KODIK_TOKEN
+// Домены указываются через запятую: 'https://site1.com,https://site2.com'
 
 const KODIK_BASE_URL = 'https://kodikapi.com';
-const ALLOWED_ORIGIN = 'https://an0ncer.github.io';
+const ALLOWED_ORIGINS = ['https://an0ncer.github.io'];
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
@@ -11,7 +12,7 @@ addEventListener('fetch', event => {
 async function handleRequest(request) {
   const origin = request.headers.get('Origin') || '';
 
-  if (!origin.startsWith(ALLOWED_ORIGIN)) {
+  if (!ALLOWED_ORIGINS.some(allowed => origin.startsWith(allowed))) {
     return new Response(JSON.stringify({ error: 'Access denied' }), {
       status: 403,
       headers: { 'Content-Type': 'application/json' }
